@@ -81,7 +81,7 @@ class ReviewView(discord.ui.View):
 
 class StaffBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix=commands.when_mentioned, intents=intents, status=discord.Status.invisible)
+        super().__init__(command_prefix=commands.when_mentioned, intents=intents)
 
     async def setup_hook(self):
         self.add_view(ReviewView())
