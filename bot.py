@@ -59,11 +59,32 @@ class DecisionView(discord.ui.View):
         await self._decide(interaction, approved=False)
 
 
+class ReviewView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Взять в рассмотрение", style=discord.ButtonStyle.primary, custom_id="req:review", emoji="🔍")
+    async def review(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not isinstance(interaction.user, discord.Member) or not has_role(interaction.user, APPROVER_ROLE_ID):
+            await interaction.response.send_message("Недостаточно прав для рассмотрения заявки.", ephemeral=True)
+            return
+
+        embed = interaction.message.embeds[0]
+        embed.set_field_at(
+            len(embed.fields) - 1,
+            name="Статус",
+            value=status_field("👀 На рассмотрении", interaction.user),
+            inline=False,
+        )
+        await interaction.response.edit_message(embed=embed, view=DecisionView())
+
+
 class StaffBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned, intents=intents)
 
     async def setup_hook(self):
+        self.add_view(ReviewView())
         self.add_view(DecisionView())
         self.tree.copy_global_to(guild=GUILD_OBJECT)
         await self.tree.sync(guild=GUILD_OBJECT)
@@ -82,7 +103,7 @@ async def require_staff(interaction: discord.Interaction) -> bool:
 async def send_request(interaction: discord.Interaction, embed: discord.Embed):
     embed.set_footer(text=f"Заявка от {interaction.user.display_name}")
     embed.timestamp = datetime.now(timezone.utc)
-    await interaction.channel.send(embed=embed, view=DecisionView())
+    await interaction.channel.send(embed=embed, view=ReviewView())
     await interaction.followup.send("Заявка создана.", ephemeral=True)
 
 
