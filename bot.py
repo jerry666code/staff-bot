@@ -93,6 +93,8 @@ async def uw(
         await interaction.response.send_message("Эта команда доступна только администрации.", ephemeral=True)
         return
 
+    await interaction.response.defer(ephemeral=True, thinking=True)
+
     embed = discord.Embed(title="✉️ Заявка на снятие наказания", color=discord.Color.blurple())
     embed.add_field(name="Наказание", value=наказание.value, inline=True)
     embed.add_field(name="Админ", value=админ.mention, inline=True)
@@ -111,9 +113,9 @@ async def uw(
     await target_channel.send(embed=embed, view=DecisionView())
 
     if target_channel.id != interaction.channel.id:
-        await interaction.response.send_message(f"Заявка отправлена в {target_channel.mention}.", ephemeral=True)
+        await interaction.followup.send(f"Заявка отправлена в {target_channel.mention}.", ephemeral=True)
     else:
-        await interaction.response.send_message("Заявка создана.", ephemeral=True)
+        await interaction.followup.send("Заявка создана.", ephemeral=True)
 
 
 if __name__ == "__main__":
