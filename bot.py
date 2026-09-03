@@ -19,7 +19,6 @@ GUILD_OBJECT = discord.Object(id=GUILD_ID)
 PUNISHMENT_CHOICES = ["Бан", "Мут", "Варн", "Кик", "Другое"]
 
 intents = discord.Intents.default()
-intents.members = True
 
 
 def has_role(member: discord.Member, role_id: int) -> bool:
